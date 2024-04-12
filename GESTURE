@@ -1,0 +1,90 @@
+#include <Wire.h>
+#include <SparkFun_APDS9960.h>
+
+// Pin Definitions
+#define RELAY_1_PIN 2
+#define RELAY_2_PIN 3
+#define RELAY_3_PIN 4
+#define RELAY_4_PIN 5
+// Add more relay pins if needed
+
+// Constants for gestures
+#define GESTURE_RIGHT_SWIPE 1
+#define GESTURE_LEFT_SWIPE 2
+#define GESTURE_UP_SWIPE 3
+#define GESTURE_DOWN_SWIPE 4
+// Add more gestures as needed
+
+// Global Variables
+SparkFun_APDS9960 apds;
+int currentGesture = 0;
+
+// Function prototypes
+void processGesture(int gesture);
+void turnOnAppliance(int appliancePin);
+void turnOffAppliance(int appliancePin);
+
+void setup() {
+  // Initialize Serial communication
+  Serial.begin(9600);
+  
+  // Initialize I2C communication
+  Wire.begin();
+  
+  // Initialize gesture sensor
+  if (!apds.init()) {
+    Serial.println("Error initializing APDS9960 sensor.");
+  }
+  
+  // Enable gesture detection
+  if (!apds.enableGestureSensor(true)) {
+    Serial.println("Error enabling gesture sensor.");
+  }
+
+  // Initialize relay pins as OUTPUT
+  pinMode(RELAY_1_PIN, OUTPUT);
+  pinMode(RELAY_2_PIN, OUTPUT);
+  pinMode(RELAY_3_PIN, OUTPUT);
+  pinMode(RELAY_4_PIN, OUTPUT);
+  // Initialize more relay pins if needed
+}
+
+void loop() {
+  // Read gesture data
+  if (apds.isGestureAvailable()) {
+    currentGesture = apds.readGesture();
+    processGesture(currentGesture);
+  }
+}
+
+void processGesture(int gesture) {
+  switch (gesture) {
+    case GESTURE_RIGHT_SWIPE:
+      turnOnAppliance(RELAY_1_PIN);
+      break;
+    case GESTURE_LEFT_SWIPE:
+      turnOffAppliance(RELAY_1_PIN);
+      break;
+    case GESTURE_UP_SWIPE:
+      turnOnAppliance(RELAY_2_PIN);
+      break;
+    case GESTURE_DOWN_SWIPE:
+      turnOffAppliance(RELAY_2_PIN);
+      break;
+    // Add more cases for additional gestures and corresponding appliances
+  }
+}
+
+void turnOnAppliance(int appliancePin) {
+  digitalWrite(appliancePin, HIGH); // Turn on appliance
+  Serial.print("Appliance connected to pin ");
+  Serial.print(appliancePin);
+  Serial.println(" turned on.");
+}
+
+void turnOffAppliance(int appliancePin) {
+  digitalWrite(appliancePin, LOW); // Turn off appliance
+  Serial.print("Appliance connected to pin ");
+  Serial.print(appliancePin);
+  Serial.println(" turned off.");
+}
