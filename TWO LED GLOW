@@ -1,0 +1,54 @@
+const int soundSensorPin = 2;
+const int ledPin1 = 13;    // Light 1
+const int ledPin2 = A0;    // Light 2 now on A0
+
+// Timing Variables
+unsigned long previousMillis = 0;
+const long interval = 500; // Interval to count claps
+int clapCount = 0;
+bool listeningForClap = false;
+
+void setup() {
+  pinMode(soundSensorPin, INPUT);
+  pinMode(ledPin1, OUTPUT);
+  pinMode(ledPin2, OUTPUT); // A0 used as a digital output
+  Serial.begin(9600);
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+
+  if (digitalRead(soundSensorPin) == HIGH) {
+    if (!listeningForClap) { // Start listening for the first clap
+      listeningForClap = true;
+      previousMillis = currentMillis;
+    }
+    clapCount++;
+    delay(100); // Debounce delay
+    while (digitalRead(soundSensorPin) == HIGH); // Wait for the clap to end
+  }
+
+  if (listeningForClap && currentMillis - previousMillis >= interval) {
+    // Clap counting interval finished
+    listeningForClap = false;
+    executeClapAction(clapCount);
+    clapCount = 0; // Reset clap count
+  }
+}
+
+void executeClapAction(int claps) {
+  if (claps == 1) {
+    // If exactly one clap was detected, turn on LED 1
+    digitalWrite(ledPin1, HIGH);
+    delay(200); // LED on duration
+    digitalWrite(ledPin1, LOW);
+  } else if (claps > 1) {
+    // If more than one clap was detected, blink LED 2 twice
+    for (int i = 0; i < 2; i++) {
+      digitalWrite(ledPin2, HIGH);
+      delay(200); // Blink on duration
+      digitalWrite(ledPin2, LOW);
+      delay(200); // Blink off duration
+    }
+  }
+}
