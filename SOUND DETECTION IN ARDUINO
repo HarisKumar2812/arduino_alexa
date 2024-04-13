@@ -1,0 +1,64 @@
+#include <iostream>
+#include <tensorflow/lite/interpreter.h>
+#include <tensorflow/lite/kernels/register.h>
+#include <tensorflow/lite/model.h>
+
+// Function to detect clapping sounds
+bool detectClapping(const std::string& audioFile) {
+    // Load audio file (assuming it's already loaded into memory)
+    std::vector<float> audioData; // Placeholder for audio data
+
+    // Extract features (e.g., spectrogram) from audio file
+    std::vector<float> features = extractFeatures(audioData);
+
+    // Load pre-trained TensorFlow Lite model
+    std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile("clapping_detection_model.tflite");
+    if (!model) {
+        std::cerr << "Failed to load TensorFlow Lite model." << std::endl;
+        return false;
+    }
+
+    // Create TensorFlow Lite interpreter
+    tflite::ops::builtin::BuiltinOpResolver resolver;
+    std::unique_ptr<tflite::Interpreter> interpreter;
+    tflite::InterpreterBuilder(*model, resolver)(&interpreter);
+    if (!interpreter) {
+        std::cerr << "Failed to create TensorFlow Lite interpreter." << std::endl;
+        return false;
+    }
+
+    // Allocate input tensor
+    interpreter->AllocateTensors();
+
+    // Populate input tensor with extracted features
+    float* inputTensor = interpreter->typed_input_tensor<float>(0);
+    std::copy(features.begin(), features.end(), inputTensor);
+
+    // Run inference
+    interpreter->Invoke();
+
+    // Get output tensor
+    float* outputTensor = interpreter->typed_output_tensor<float>(0);
+    float prediction = outputTensor[0];
+
+    // Determine if clapping sound is detected
+    return prediction > 0.5f;
+}
+
+// Function to extract features from audio data
+std::vector<float> extractFeatures(const std::vector<float>& audioData) {
+    // Perform feature extraction (e.g., spectrogram computation)
+    // Placeholder for feature extraction logic
+    std::vector<float> features; // Placeholder for features
+    return features;
+}
+
+int main() {
+    std::string audioFile = "sample_audio.wav";
+    if (detectClapping(audioFile)) {
+        std::cout << "Clapping sound detected!" << std::endl;
+    } else {
+        std::cout << "No clapping sound detected." << std::endl;
+    }
+    return 0;
+}
