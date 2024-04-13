@@ -17,7 +17,7 @@ This code is for a simple Arduino project that responds to clapping sounds. Here
 
 Overall, this code creates a simple clap-responsive system where different LED responses are triggered depending on the number of claps detected within a certain time frame.
 
-**GESTURE MODEL**
+**GESTURE MODEL DETECTION USING ARDUINO**
 This code is for controlling appliances using gestures detected by a gesture sensor. Here's a simple breakdown:
 
 1. **Include Libraries**: The code includes the necessary libraries for communicating with the gesture sensor and controlling the appliances.
@@ -37,3 +37,9 @@ This code is for controlling appliances using gestures detected by a gesture sen
 8. **Turn On/Off Appliance Functions**: These functions control the relay connected to the specified appliance pin. They turn the appliance on or off and print a message indicating the action taken.
 
 Overall, this code allows you to control appliances by performing different gestures in front of the sensor. For example, a right swipe gesture might turn on one appliance, while a left swipe gesture might turn it off. Similarly, up and down swipe gestures can control another appliance.
+
+**SOUND DETECTION USING ARDUINO**
+We include the necessary TensorFlow Lite headers for working with the model.
+The detectClapping() function loads the audio data, extracts features, loads the TensorFlow Lite model, sets up the interpreter, runs inference, and determines if clapping sounds are detected.
+The extractFeatures() function performs feature extraction (e.g., spectrogram computation).
+In the main() function, we call detectClapping() with the audio file path and print the detection result.
